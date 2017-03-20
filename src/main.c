@@ -19,13 +19,13 @@ int main(int argc, const char * argv[])
     GPIOD->MODER |= GPIO_MODER_MODER12_0 | GPIO_MODER_MODER14_0;
 
     /* Timer configuration (one second blink) */
-    NVIC->ISER[0] |= 1 << (TIM2_IRQn);
+    NVIC->ISER[0] |= 1 << (TIM2_IRQn); /* Interrupt configuration */
 
-    TIM2->PSC = 1680;
-    TIM2->DIER = TIM_DIER_UIE;
-    TIM2->ARR = 10000;
-    TIM2->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN;
-    TIM2->EGR = 0x01;
+    TIM2->PSC = 1680;           /* Set auto-reset value */
+    TIM2->DIER = TIM_DIER_UIE;  /* Enable interrupts */
+    TIM2->ARR = 10000;          /* Set prescaler value */
+    tim2->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN; /* Enable auto-reloadn and counter register */
+    TIM2->EGR = 0x01;           /* Enable event generation */
 
     for ( ; ; ) {}
 }
