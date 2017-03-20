@@ -4,6 +4,7 @@ LD=gcc
 OBJCOPY=objcopy
 RM=rm -rf
 MKDIR=mkdir -p
+OCD=openocd
 
 .PHONY: clean flash debug release
 
@@ -18,7 +19,6 @@ CFLAGS += $(CFLAGS_DEBUG)
 LDFLAGS = -mcpu=cortex-m4 -mlittle-endian -D$(BOARD_TYPE) -mthumb -Tlinker/STM32F407VG_FLASH.ld -Wl,--gc-sections
 
 I_PATH = include
-
 
 OUTPUT_DIR = bin
 FLASH_NAME = flash
@@ -37,12 +37,28 @@ TOREMOVE += $(addsuffix /*.d, $(PRJ_C_SRC_DIRS))
 TOREMOVE_ALL += $(addsuffix /*.elf, $(OUTPUT_DIR))
 TOREMOVE_ALL += $(addsuffix /*.hex, $(OUTPUT_DIR))
 
+PWD=`pwd`
+
+LOAD_IMAGE_CMD = "flash write_image erase $(OUTPUT_DIR)/$(FLASH_NAME).hex"
+VERIFY_IMAGE_CMD = "verify_image /home/evgeniy/Documents/dev/CMSIS/bin/flash.hex"
+OPENOCD_SCRIPT = /usr/share/openocd/scripts/board/stm32f4discovery.cfg
+OPENOCD_STARTUP =\
+-c "init"\
+-c "halt"\
+-c $(LOAD_IMAGE_CMD)\
+-c $(VERIFY_IMAGE_CMD)\
+-c "reset run"\
+-c "shutdown"\
+
 image: $(OBJECT_FILES)
 	@echo "Linking image $(FLASH_NAME).elf"
 	@$(MKDIR) $(OUTPUT_DIR)
 	$(LINK)
 	@echo "Assembling final image $(FLASH_NAME).hex"
 	$(CONVERT)
+
+burn: image
+	$(OCD) -f$(OPENOCD_SCRIPT) $(OPENOCD_STARTUP)
 
 %.o: %.c
 	@echo "Compiling C file:   " $<
