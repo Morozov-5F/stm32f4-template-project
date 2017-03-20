@@ -1,4 +1,4 @@
-CROSS_COMPILE=/opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-
+CROSS_COMPILE?=/opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-
 CC=gcc
 LD=gcc
 OBJCOPY=objcopy
@@ -9,7 +9,12 @@ MKDIR=mkdir -p
 
 BOARD_TYPE=STM32F407xx
 
-CFLAGS  = --specs=nosys.specs -Wall -g -mcpu=cortex-m4 -mlittle-endian -mthumb -D$(BOARD_TYPE)
+CFLAGS_DEBUG   = -g -O0
+CFLAGS_RELEASE = -Os
+
+CFLAGS  = --specs=nosys.specs -Wall -mcpu=cortex-m4 -mlittle-endian -mthumb -D$(BOARD_TYPE)
+CFLAGS += $(CFLAGS_DEBUG)
+
 LDFLAGS = -mcpu=cortex-m4 -mlittle-endian -D$(BOARD_TYPE) -mthumb -Tlinker/STM32F407VG_FLASH.ld -Wl,--gc-sections
 
 I_PATH = include
