@@ -7,8 +7,10 @@ MKDIR=mkdir -p
 
 .PHONY: clean flash debug release
 
-CFLAGS  = --specs=nosys.specs -Wall -mcpu=cortex-m4 -mlittle-endian -mthumb -Os
-LDFLAGS = -Tlinker/STM32F407VG_FLASH.ld -Wl,--gc-sections
+BOARD_TYPE=STM32F407xx
+
+CFLAGS  = --specs=nosys.specs -Wall -g -mcpu=cortex-m4 -mlittle-endian -mthumb -D$(BOARD_TYPE)
+LDFLAGS = -mcpu=cortex-m4 -mlittle-endian -D$(BOARD_TYPE) -mthumb -Tlinker/STM32F407VG_FLASH.ld -Wl,--gc-sections
 
 I_PATH = include
 
