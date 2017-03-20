@@ -24,7 +24,7 @@ int main(int argc, const char * argv[])
     TIM2->PSC = 1680;           /* Set auto-reset value */
     TIM2->DIER = TIM_DIER_UIE;  /* Enable interrupts */
     TIM2->ARR = 10000;          /* Set prescaler value */
-    tim2->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN; /* Enable auto-reloadn and counter register */
+    TIM2->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN; /* Enable auto-reloadn and counter register */
     TIM2->EGR = 0x01;           /* Enable event generation */
 
     for ( ; ; ) {}
