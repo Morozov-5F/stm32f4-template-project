@@ -5,6 +5,9 @@ OBJCOPY=objcopy
 RM=rm -rf
 MKDIR=mkdir -p
 OCD=openocd
+SCREEN=screen
+SCRIPTS_DIR=scripts
+SCREENRC=debug.screenrc
 
 .PHONY: clean flash debug release
 
@@ -13,10 +16,10 @@ BOARD_TYPE=STM32F407xx
 CFLAGS_DEBUG   = -g -O0
 CFLAGS_RELEASE = -Os
 
-CFLAGS  = --specs=nosys.specs -Wall -mcpu=cortex-m4 -mlittle-endian -mthumb -D$(BOARD_TYPE)
+CFLAGS  = --specs=nosys.specs -Wall -mcpu=cortex-m4 -mlittle-endian -mthumb -D$(BOARD_TYPE) -DOS_USE_TRACE_ITM
 CFLAGS += $(CFLAGS_DEBUG)
 
-LDFLAGS = -mcpu=cortex-m4 -mlittle-endian -D$(BOARD_TYPE) -mthumb -Tlinker/STM32F407VG_FLASH.ld -Wl,--gc-sections
+LDFLAGS = -mcpu=cortex-m4 -mlittle-endian -D$(BOARD_TYPE) -mthumb -Tlinker/STM32F407VG_FLASH.ld -Wl,--gc-sections --specs=rdimon.specs -lc -lrdimon
 
 I_PATH = include
 
@@ -27,7 +30,8 @@ COMPILE = $(CROSS_COMPILE)$(CC) $(CFLAGS) -I$(I_PATH) -MD -c $< -o $@
 LINK    = $(CROSS_COMPILE)$(LD) $(LDFLAGS) $(OBJECT_FILES) -o $(OUTPUT_DIR)/$(FLASH_NAME).elf
 CONVERT = $(CROSS_COMPILE)$(OBJCOPY) -Oihex $(OUTPUT_DIR)/$(FLASH_NAME).elf $(OUTPUT_DIR)/$(FLASH_NAME).hex
 
-PRJ_C_SRC_DIRS = src
+PRJ_C_SRC_DIRS  = src
+PRJ_C_SRC_DIRS += src/trace
 
 OBJECT_FILES += $(patsubst %.c, %.o, $(wildcard $(addsuffix /*.c, $(PRJ_C_SRC_DIRS))))
 OBJECT_FILES += $(patsubst %.s, %.o, $(wildcard $(addsuffix /*.s, $(PRJ_C_SRC_DIRS))))
@@ -40,8 +44,8 @@ TOREMOVE_ALL += $(addsuffix /*.hex, $(OUTPUT_DIR))
 PWD=`pwd`
 
 LOAD_IMAGE_CMD = "flash write_image erase $(OUTPUT_DIR)/$(FLASH_NAME).hex"
-VERIFY_IMAGE_CMD = "verify_image /home/evgeniy/Documents/dev/CMSIS/bin/flash.hex"
-OPENOCD_SCRIPT = /usr/share/openocd/scripts/board/stm32f4discovery.cfg
+VERIFY_IMAGE_CMD = "verify_image $(OUTPUT_DIR)/$(FLASH_NAME).hex"
+OPENOCD_SCRIPT ?= /usr/share/openocd/scripts/board/stm32f4discovery.cfg
 OPENOCD_STARTUP =\
 -c "init"\
 -c "halt"\
@@ -75,6 +79,9 @@ clean:
 clean_all: clean
 	@echo "Removing image files: " $(TOREMOVE_ALL)
 	@$(RM) $(TOREMOVE_ALL)
+
+debug:
+	(cd $(SCRIPTS_DIR) && $(SCREEN) -c $(SCREENRC))
 
 info:
 	@echo "### Diagnostic info ###"

@@ -1,0 +1,12 @@
+# Screen startup file to run both GDB and OpenOCD
+
+# 1. Run OpenOCD server in a separate window
+# You need to replace openocd startup command and
+# config file location to start it properly
+#
+# screen -t /opt/opeoncd/bin/openocd -f/opt/openocd/scripts/board/stm32f4discovery.cfg
+
+# 2. Run GDB server in another window
+# You need to replace GDB startup command and image name
+#
+# /opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-gdb ../bin/flash.elf
