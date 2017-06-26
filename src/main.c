@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <CMSIS/stm32f4xx.h>
 
 void TIM2_IRQHandler(void)
@@ -12,6 +13,8 @@ void TIM2_IRQHandler(void)
 
 int main(int argc, const char * argv[])
 {
+    printf("Hello, world!");
+
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
@@ -24,7 +27,7 @@ int main(int argc, const char * argv[])
     TIM2->PSC = 1680;           /* Set auto-reset value */
     TIM2->DIER = TIM_DIER_UIE;  /* Enable interrupts */
     TIM2->ARR = 10000;          /* Set prescaler value */
-    TIM2->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN; /* Enable auto-reloadn and counter register */
+    TIM2->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN; /* Enable auto-reload and counter register */
     TIM2->EGR = 0x01;           /* Enable event generation */
 
     for ( ; ; ) {}

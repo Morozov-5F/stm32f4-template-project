@@ -4,3 +4,4 @@ monitor arm semihosting enable
 monitor reset halt
 load
 monitor reset init
+layout src
